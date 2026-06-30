@@ -12,6 +12,13 @@ from app.core.logging import setup_logging
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """应用生命周期管理
+
+    在应用启动时执行初始化（如配置日志）。
+
+    Args:
+        app: FastAPI 应用实例。
+    """
     setup_logging()
     yield
 
