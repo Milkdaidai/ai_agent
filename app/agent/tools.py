@@ -4,7 +4,7 @@ from typing import Any, Callable
 
 from app.core.exceptions import ToolError
 
-
+# test
 class ToolRegistry:
     def __init__(self):
         self._tools: dict[str, dict] = {}
