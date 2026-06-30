@@ -2,7 +2,7 @@
 
 import re
 
-
+# 本地main提交到远程dev
 def truncate(text: str, max_length: int = 2000) -> str:
     """截断文本到指定长度
 
