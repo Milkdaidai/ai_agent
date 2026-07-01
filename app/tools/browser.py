@@ -2,10 +2,16 @@
 
 import httpx
 from bs4 import BeautifulSoup
+from langchain_core.tools import tool
 
 
+@tool
 async def browse(url: str) -> str:
-    """访问网页并提取文本内容"""
+    """访问网页并提取文本内容
+
+    Args:
+        url: 网页 URL。
+    """
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             resp = await client.get(url, headers={"User-Agent": "AI-Agent/1.0"})
@@ -14,19 +20,3 @@ async def browse(url: str) -> str:
             return text[:2000]
     except Exception as e:
         return f"访问失败: {e}"
-
-
-BROWSER_TOOL_DEFINITION = {
-    "type": "function",
-    "function": {
-        "name": "browse",
-        "description": "访问网页并提取文本",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "url": {"type": "string", "description": "网页 URL"},
-            },
-            "required": ["url"],
-        },
-    },
-}

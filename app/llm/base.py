@@ -1,42 +1,23 @@
-"""LLM 抽象基类"""
+"""LLM 抽象基类（基于 LangChain）"""
 
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Any
+from langchain_core.language_models import BaseChatModel
 
 
-@dataclass
-class LLMResponse:
-    """LLM 响应数据类
+class BaseLLM:
+    """LLM 包装类，封装 LangChain ChatModel 的创建"""
 
-    Attributes:
-        content: LLM 返回的文本内容。
-        tool_calls: LLM 返回的工具调用列表。
-    """
-    content: str | None = None
-    tool_calls: list[Any] | None = None
+    def __init__(self, model: str, temperature: float, api_key: str, base_url: str):
+        self.model = model
+        self.temperature = temperature
+        self.api_key = api_key
+        self.base_url = base_url
 
-
-class BaseLLM(ABC):
-    """LLM 抽象基类，定义统一的聊天接口"""
-
-    @abstractmethod
-    async def chat(
-        self,
-        messages: list[dict],
-        tools: list[dict] | None = None,
-        temperature: float = 0.7,
-        max_tokens: int = 4096,
-    ) -> LLMResponse:
-        """调用 LLM 聊天接口（抽象方法）
-
-        Args:
-            messages: 消息列表。
-            tools: OpenAI 格式的工具定义列表。
-            temperature: 生成温度。
-            max_tokens: 最大生成 Token 数。
-
-        Returns:
-            LLMResponse 对象。
-        """
-        ...
+    def build(self) -> BaseChatModel:
+        """创建 LangChain ChatModel 实例"""
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            model=self.model,
+            temperature=self.temperature,
+            api_key=self.api_key,
+            base_url=self.base_url,
+        )

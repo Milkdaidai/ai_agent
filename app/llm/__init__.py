@@ -1,35 +1,46 @@
-"""大模型封装，提供 LLM 工厂和多种实现"""
+"""大模型封装（基于 LangChain）"""
 
 from app.llm.base import BaseLLM
-from app.llm.openai import OpenAILLM
-from app.llm.deepseek import DeepSeekLLM
-from app.llm.ollama import OllamaLLM
+from app.core.config import settings
 from app.core.exceptions import ConfigError
 
 
 class LLMFactory:
-    """LLM 工厂类，根据配置创建对应供应商的 LLM 实例"""
+    """LLM 工厂，根据配置创建 LangChain ChatModel 实例"""
 
     _providers = {
-        "openai": OpenAILLM,
-        "deepseek": DeepSeekLLM,
-        "ollama": OllamaLLM,
+        "openai": lambda: BaseLLM(
+            model=settings.LLM_MODEL,
+            temperature=settings.LLM_TEMPERATURE,
+            api_key=settings.OPENAI_API_KEY,
+            base_url=settings.OPENAI_BASE_URL,
+        ),
+        "deepseek": lambda: BaseLLM(
+            model="deepseek-chat",
+            temperature=settings.LLM_TEMPERATURE,
+            api_key=settings.DEEPSEEK_API_KEY,
+            base_url=settings.DEEPSEEK_BASE_URL,
+        ),
+        "ollama": lambda: BaseLLM(
+            model=settings.LLM_MODEL,
+            temperature=settings.LLM_TEMPERATURE,
+            api_key="ollama",
+            base_url=settings.OLLAMA_BASE_URL + "/v1",
+        ),
     }
 
     @classmethod
-    def create(cls, provider: str) -> BaseLLM:
-        """根据提供商名称创建 LLM 实例
-
-        Args:
-            provider: LLM 提供商名称（openai / deepseek / ollama）。
+    def create(cls) -> "ChatOpenAI":
+        """根据配置创建 LangChain ChatModel 实例
 
         Returns:
-            BaseLLM 子类实例。
+            ChatOpenAI（或兼容的 ChatModel）实例。
 
         Raises:
             ConfigError: 不支持的 provider 时抛出。
         """
-        llm_cls = cls._providers.get(provider)
-        if not llm_cls:
+        provider = settings.LLM_PROVIDER
+        builder = cls._providers.get(provider)
+        if not builder:
             raise ConfigError(f"不支持的 LLM provider: {provider}")
-        return llm_cls()
+        return builder().build()

@@ -8,7 +8,7 @@ from app.api.chat import router as chat_router
 from app.core.config import settings
 from app.core.logging import setup_logging
 
-# dev 提交测试
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """应用生命周期管理

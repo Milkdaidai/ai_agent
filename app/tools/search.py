@@ -1,24 +1,13 @@
 """搜索工具"""
 
-import httpx
+from langchain_core.tools import tool
 
 
+@tool
 async def web_search(query: str) -> str:
-    """执行网络搜索（需配置搜索 API）"""
+    """搜索互联网信息（需配置搜索 API）
+
+    Args:
+        query: 搜索关键词。
+    """
     return f"搜索功能待配置。查询: {query}"
-
-
-SEARCH_TOOL_DEFINITION = {
-    "type": "function",
-    "function": {
-        "name": "web_search",
-        "description": "搜索互联网信息",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "query": {"type": "string", "description": "搜索关键词"},
-            },
-            "required": ["query"],
-        },
-    },
-}
